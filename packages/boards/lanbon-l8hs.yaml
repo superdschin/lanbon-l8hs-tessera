@@ -1,0 +1,110 @@
+# ESP Screens - Lanbon L8-HS profile
+# Hardware: classic ESP32, 8 MB flash, ST7789V, FT6336 capacitive touch
+# Tested on the three-relay variant. Verify your board revision before flashing.
+
+packages:
+  build: !include ../hardware/esp-idf.yaml
+  look: !include ../looks/compact.yaml
+  touch: !include ../features/capacitive-touch.yaml
+  backlight: !include ../features/backlight.yaml
+  self_test: !include ../features/self-test.yaml
+  led: !include ../features/rgb-led.yaml
+
+substitutions:
+  BOARD_ID: "lanbon-l8hs"
+  DEVICE_NAME: "lanbon-l8hs-new"
+  DEVICE_FRIENDLY_NAME: "My Lanbon L8-HS"
+  BEDSIDE_OWN_DIGITS: "0"
+  PANEL_W: "240"
+  PANEL_H: "320"
+  DISPLAY_DPI: "143"
+  ROTATION_LANDSCAPE: "270"
+  TOUCH_SWAP_XY: "false"
+  TOUCH_MIRROR_X: "true"
+  TOUCH_MIRROR_Y: "true"
+  GRID_COLS: "2"
+  GRID_ROWS: "3"
+  GRID_COLS_PORTRAIT: "1"
+  GRID_ROWS_PORTRAIT: "4"
+  LVGL_BUFFER_SIZE: "8%"
+  DISPLAY_MODEL: "ST7789V"
+  DISPLAY_DATA_RATE: "20MHz"
+  DISPLAY_INVERT_COLORS: "false"
+  BACKLIGHT_FREQUENCY: "1000Hz"
+
+esp32:
+  board: esp32dev
+  variant: esp32
+  flash_size: 8MB
+  framework:
+    advanced:
+      sram1_as_iram: true
+
+spi:
+  - id: lcd
+    clk_pin: GPIO19
+    mosi_pin: GPIO23
+
+i2c:
+  id: touch_bus
+  sda: GPIO4
+  scl:
+    number: GPIO0
+    ignore_strapping_warning: true
+  scan: true
+
+output:
+  - platform: ledc
+    pin: GPIO5
+    id: gpio_backlight_pwm
+    frequency: ${BACKLIGHT_FREQUENCY}
+  # Names required by the shared RGB LED feature.
+  - platform: ledc
+    pin: GPIO26
+    id: output_red
+  - platform: ledc
+    pin: GPIO32
+    id: output_green
+  - platform: ledc
+    pin: GPIO33
+    id: output_blue
+
+touchscreen:
+  - platform: ft63x6
+    id: ts_touch
+    i2c_id: touch_bus
+    display: my_display
+    update_interval: 20ms
+
+display:
+  - platform: mipi_spi
+    id: my_display
+    spi_id: lcd
+    model: ${DISPLAY_MODEL}
+    data_rate: ${DISPLAY_DATA_RATE}
+    cs_pin: GPIO22
+    dc_pin: GPIO21
+    reset_pin: GPIO18
+    invert_colors: ${DISPLAY_INVERT_COLORS}
+    update_interval: never
+    auto_clear_enabled: false
+    dimensions:
+      width: 240
+      height: 320
+
+switch:
+  - platform: gpio
+    pin: GPIO12
+    name: "Lanbon Relay 1"
+    id: lanbon_relay_1
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    pin: GPIO14
+    name: "Lanbon Relay 2"
+    id: lanbon_relay_2
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    pin: GPIO27
+    name: "Lanbon Relay 3"
+    id: lanbon_relay_3
+    restore_mode: ALWAYS_OFF
