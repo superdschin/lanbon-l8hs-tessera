@@ -52,4 +52,4 @@ This companion repository alone does not add the board to the Tessera Screen Man
 
 ## License and upstream
 
-The board file follows the structure of the Tessera / ESP Screens project. See `LICENSE` and the upstream project's licensing and contribution requirements before redistribution or submission.
+This repository is a community companion for Tessera / ESP Screens. Before redistributing this profile or submitting it upstream, check the current license terms of the original Tessera / ESP Screens project. A repository-specific license has not yet been added.
